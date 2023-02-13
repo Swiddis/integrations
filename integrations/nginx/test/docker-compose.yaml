@@ -11,7 +11,21 @@ services:
       - 9200:9200
       - 9600:9600
     networks:
-      - www
+      - integration
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    depends_on:
+      - opensearch
+    ports:
+      - 5601:5601
+    expose:
+      - 5601
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: true
+    networks:
+      - integration
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
@@ -24,7 +38,7 @@ services:
     ports:
       - 16686:16686
     networks:
-      - www
+      - integration
   collector:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/volume/otel-collector-config.yaml"]
@@ -33,7 +47,7 @@ services:
     ports:
       - 4317:4317
     networks:
-      - www
+      - integration
   nginx:
     image: nginx-otel
     build:
@@ -43,7 +57,7 @@ services:
     ports:
       - 8080:80
     networks:
-      - www
+      - integration
 
 networks:
-  www:
+  integration:
